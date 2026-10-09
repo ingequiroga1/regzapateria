@@ -1,0 +1,1197 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>DevQ Registro · Paso Claro</title><style>
+:root{--ink:#17364d;--muted:#627487;--line:#dce4e9;--cream:#fff4d1}*{box-sizing:border-box}body{margin:0;background:#f3f6f8;color:var(--ink);font:15px/1.5 Arial,sans-serif}main{max-width:1120px;margin:auto;padding:30px 24px 50px}header{display:flex;justify-content:space-between;gap:18px;align-items:start}h1{font-size:32px;line-height:1.15;margin:8px 0 10px}h2{font-size:20px;margin:0 0 16px}p{margin:6px 0 16px}.eyebrow{font-size:12px;letter-spacing:2px;font-weight:bold}.badge{background:var(--cream);padding:8px 14px;border-radius:24px;white-space:nowrap}.muted{color:var(--muted)}.intro{max-width:780px}.card{background:white;border:1px solid var(--line);border-radius:14px;padding:24px;margin:18px 0}.toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.toolbar label{max-width:190px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.metric{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px}.metric span{display:block;color:var(--muted);font-size:13px}.metric strong{font-size:25px;display:block;margin-top:5px}.metric.net{background:var(--ink);color:#fff}.metric.net span{color:#d9e6ef}.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}label{display:block;font-size:13px;font-weight:bold}input,select{display:block;width:100%;padding:11px;margin-top:6px;background:#fff;border:1px solid #aebdc9;border-radius:7px;font:15px Arial;color:var(--ink)}input:focus,select:focus{outline:3px solid #c9dfea;border-color:var(--ink)}.wide{grid-column:span 2}button{border:1px solid var(--ink);border-radius:7px;padding:11px 17px;background:var(--ink);color:white;font:600 14px Arial;cursor:pointer}button.secondary{background:white;color:var(--ink)}button.small{padding:5px 8px;font-size:12px}.actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:20px}.total{font-weight:bold;margin-right:auto}#message{margin-top:14px;padding:10px 0;min-height:22px;color:#226145}#message.error{color:#a82d28}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}th{text-align:left;background:#edf2f5;padding:10px}td{padding:10px;border-bottom:1px solid var(--line)}td.num{text-align:right}.void{color:#798895;text-decoration:line-through}details{margin-top:15px}summary{cursor:pointer;font-weight:bold}.storage{font-size:12px;color:var(--muted)}.notice{font-size:13px;color:var(--muted)}.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px}.annul{color:#a82d28;background:#fff;border-color:#c8a2a0}footer{margin-top:30px;font-size:13px;color:var(--muted)}@media(max-width:700px){main{padding:20px 14px}h1{font-size:26px}.fields{grid-template-columns:1fr 1fr}.metrics{grid-template-columns:1fr 1fr}.cols{grid-template-columns:1fr}header{display:block}.badge{display:inline-block}.wide{grid-column:span 2}.card{padding:18px}}@media(max-width:420px){.fields{grid-template-columns:1fr}.wide{grid-column:span 1}.metric strong{font-size:20px}}
+
+[hidden]{display:none!important}
+.authwrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.authcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:28px;width:100%;max-width:400px}
+.authcard h1{font-size:26px}.authcard label{margin-top:14px}.authcard .full{width:100%;margin-top:18px}
+.authmsg{margin-top:14px;min-height:20px;font-size:13px;color:#226145}.authmsg.error{color:#a82d28}
+.authlinks{display:flex;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap}
+button.linkbtn{background:none;border:0;color:var(--ink);text-decoration:underline;padding:4px 0;font:13px Arial;cursor:pointer}
+.userbox{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.userbox .muted{font-size:13px;word-break:break-all}
+#sync.error{color:#a82d28}
+</style></head><body>
+<div id="auth" class="authwrap" hidden><div class="authcard">
+<div class="eyebrow">DEVQ REGISTRO</div><h1>Zapatería Paso Claro</h1>
+<p class="muted" id="authTitle"></p>
+<div id="cfgWarn" class="authmsg error" hidden>Falta configurar Supabase. Edita el bloque CONFIG al inicio del script (SUPABASE_URL y SUPABASE_ANON_KEY).</div>
+<form id="authForm" novalidate>
+<label id="emailWrap">Correo electrónico<input id="authEmail" type="email" autocomplete="email" inputmode="email"></label>
+<label id="passWrap">Contraseña<input id="authPass" type="password" autocomplete="current-password" minlength="6"></label>
+<button class="full" id="authSubmit" type="submit"></button>
+<div class="authmsg" id="authMsg" role="status" aria-live="polite"></div>
+</form>
+<div class="authlinks"><button type="button" class="linkbtn" id="lnkA"></button><button type="button" class="linkbtn" id="lnkB"></button></div>
+</div></div>
+<main id="app" hidden><header><div><div class="eyebrow">DEVQ REGISTRO</div><h1>Zapatería Paso Claro</h1><p class="intro muted">Registra una venta y observa cómo cambia el resumen. Todos los datos iniciales son ficticios.</p></div><div class="userbox"><span class="badge">Acceso con Supabase</span><span class="muted" id="userEmail"></span><button class="secondary small" id="logout" type="button">Cerrar sesión</button></div></header>
+<div class="toolbar"><label>Mes del resumen<input id="month" type="month" value="2026-09"></label><button id="export" class="secondary">Descargar registros CSV</button><button id="reset" class="secondary">Restablecer ejemplo</button></div>
+<div class="metrics"><div class="metric"><span>Ventas brutas</span><strong id="gross"></strong></div><div class="metric"><span>Descuentos</span><strong id="discounts"></strong></div><div class="metric"><span>Devoluciones</span><strong id="returns"></strong></div><div class="metric net"><span>Ventas netas</span><strong id="net"></strong></div></div>
+<p class="notice">Los totales corresponden al mes seleccionado. Las ventas netas no son utilidad ni saldo de caja. Los días sin registros no prueban que no hubo ventas.</p>
+<section class="card"><h2>Registrar movimiento</h2><p class="muted">Una captura por producto. Para varios productos en un ticket, repite el folio y cambia la línea.</p><form id="sale"><div class="fields">
+<label>Fecha de operación<input name="date" type="date" value="2026-09-28" required></label><label>Folio<input name="folio" placeholder="V037" maxlength="20" required pattern="[A-Za-z0-9_-]+"></label><label>Línea<input name="line" type="number" min="1" step="1" value="1" required></label>
+<label>Tipo<select name="type"><option value="Venta">Venta</option><option value="Devolucion">Devolución</option></select></label><label>Referencia original<input name="ref" placeholder="Solo devolución: V001/1"></label><label>Producto<select name="sku" id="sku"></select></label>
+<label>Cantidad de pares<input name="qty" type="number" min="1" step="1" value="1" required></label><label>Precio por par MXN<input name="price" type="number" min="0" step="0.01" value="450" required></label><label>Descuento total de la línea MXN<input name="discount" type="number" min="0" step="0.01" value="0" required></label>
+<label>Forma de pago<select name="pay"><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option></select></label><label>Capturista<select name="person"><option>Ana</option><option>Laura</option></select></label><label>Observación<input name="note" maxlength="200" placeholder="Motivo si es devolución o ajuste"></label>
+</div><div class="actions"><span class="total" id="amount"></span><button type="submit">Guardar movimiento</button></div><div id="message" role="status" aria-live="polite"></div></form><p class="storage" id="storage"></p><p class="storage" id="sync"></p><button class="secondary small" id="retry" type="button" hidden>Reintentar envío</button></section>
+<div class="cols"><section class="card"><h2>Cierre diario</h2><div class="scroll"><table><thead><tr><th>Fecha</th><th>Ventas netas</th><th>Pares netos</th></tr></thead><tbody id="daily"></tbody></table></div></section><section class="card"><h2>Cómo probarlo</h2><ol><li>Septiembre inicia con <b>$24,430</b> en ventas netas.</li><li>Registra V037, línea 1, PC01, un par a $450, sin descuento.</li><li>Septiembre debe cambiar a <b>$24,880</b>.</li><li>Cambia a octubre: verás una venta de $450.</li><li>Descarga el CSV para conservar o trasladar los registros.</li></ol><details><summary>Uso del CSV en Excel</summary><p>Abre el CSV indicando UTF-8, separador coma y Fecha como fecha. Copia solo los datos, sin encabezados. En una copia del Excel, limpia A6:N505 en Registro y pega los datos desde A6. Conserva O:T, que contienen fórmulas. El CSV contiene todos los movimientos: reemplaza los datos anteriores para evitar duplicarlos.</p></details><p class="notice">Capacidad preparada del Excel: 500 filas. El archivo HTML no escribe directamente en Excel o Google Sheets. Las anulaciones de este demo no tienen control de acceso por usuario.</p></section></div>
+<section class="card"><h2>Movimientos del mes</h2><p class="muted">Una anulación conserva la fila y la excluye del cálculo. Para corregir, anula y vuelve a registrar.</p><div class="scroll"><table><thead><tr><th>Fecha</th><th>Folio / línea</th><th>Tipo</th><th>SKU</th><th>Pares</th><th>Importe</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="records"></tbody></table></div></section>
+<footer>Cada movimiento se guarda en este navegador y se envía a Google Apps Script (hoja de cálculo y correo de confirmación) con tu sesión de Supabase. Los datos iniciales de ejemplo son ficticios y no se envían. Exporta el CSV para conservar una copia local.</footer></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const DATA={
+  "catalog": [
+    [
+      "PC01",
+      "Tenis urbano dama",
+      "Par",
+      450
+    ],
+    [
+      "PC02",
+      "Tenis urbano caballero",
+      "Par",
+      520
+    ],
+    [
+      "PC03",
+      "Sandalia casual",
+      "Par",
+      280
+    ],
+    [
+      "PC04",
+      "Zapato escolar",
+      "Par",
+      390
+    ],
+    [
+      "PC05",
+      "Botín dama",
+      "Par",
+      650
+    ],
+    [
+      "PC06",
+      "Mocasín caballero",
+      "Par",
+      580
+    ],
+    [
+      "PC07",
+      "Tenis infantil",
+      "Par",
+      350
+    ],
+    [
+      "PC08",
+      "Flat dama",
+      "Par",
+      320
+    ],
+    [
+      "PC09",
+      "Sandalia infantil",
+      "Par",
+      240
+    ],
+    [
+      "PC10",
+      "Zapato vestir",
+      "Par",
+      720
+    ]
+  ],
+  "rows": [
+    [
+      "2026-09-21",
+      "V001",
+      1,
+      "Venta",
+      "",
+      "PC01",
+      1,
+      450,
+      0,
+      "Efectivo",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-21 10:01"
+    ],
+    [
+      "2026-09-21",
+      "V001",
+      2,
+      "Venta",
+      "",
+      "PC02",
+      1,
+      520,
+      0,
+      "Efectivo",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-21 10:02"
+    ],
+    [
+      "2026-09-21",
+      "V002",
+      1,
+      "Venta",
+      "",
+      "PC02",
+      1,
+      520,
+      0,
+      "Tarjeta",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-21 11:01"
+    ],
+    [
+      "2026-09-21",
+      "V003",
+      1,
+      "Venta",
+      "",
+      "PC03",
+      1,
+      280,
+      20,
+      "Transferencia",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-21 12:01"
+    ],
+    [
+      "2026-09-21",
+      "V004",
+      1,
+      "Venta",
+      "",
+      "PC04",
+      1,
+      390,
+      0,
+      "Efectivo",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-21 13:01"
+    ],
+    [
+      "2026-09-21",
+      "V004",
+      2,
+      "Venta",
+      "",
+      "PC05",
+      1,
+      650,
+      0,
+      "Efectivo",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-21 13:02"
+    ],
+    [
+      "2026-09-21",
+      "V005",
+      1,
+      "Venta",
+      "",
+      "PC05",
+      2,
+      650,
+      0,
+      "Tarjeta",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-21 14:01"
+    ],
+    [
+      "2026-09-22",
+      "V006",
+      1,
+      "Venta",
+      "",
+      "PC02",
+      1,
+      520,
+      0,
+      "Tarjeta",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-22 10:01"
+    ],
+    [
+      "2026-09-22",
+      "V006",
+      2,
+      "Venta",
+      "",
+      "PC03",
+      1,
+      280,
+      0,
+      "Tarjeta",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-22 10:02"
+    ],
+    [
+      "2026-09-22",
+      "V007",
+      1,
+      "Venta",
+      "",
+      "PC03",
+      1,
+      280,
+      0,
+      "Transferencia",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-22 11:01"
+    ],
+    [
+      "2026-09-22",
+      "V008",
+      1,
+      "Venta",
+      "",
+      "PC04",
+      1,
+      390,
+      20,
+      "Efectivo",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-22 12:01"
+    ],
+    [
+      "2026-09-22",
+      "V009",
+      1,
+      "Venta",
+      "",
+      "PC05",
+      1,
+      650,
+      0,
+      "Tarjeta",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-22 13:01"
+    ],
+    [
+      "2026-09-22",
+      "V009",
+      2,
+      "Venta",
+      "",
+      "PC06",
+      1,
+      580,
+      0,
+      "Tarjeta",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-22 13:02"
+    ],
+    [
+      "2026-09-22",
+      "V010",
+      1,
+      "Venta",
+      "",
+      "PC06",
+      2,
+      580,
+      0,
+      "Transferencia",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-22 14:01"
+    ],
+    [
+      "2026-09-23",
+      "V011",
+      1,
+      "Venta",
+      "",
+      "PC03",
+      1,
+      280,
+      0,
+      "Transferencia",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-23 10:01"
+    ],
+    [
+      "2026-09-23",
+      "V011",
+      2,
+      "Venta",
+      "",
+      "PC04",
+      1,
+      390,
+      0,
+      "Transferencia",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-23 10:02"
+    ],
+    [
+      "2026-09-23",
+      "V012",
+      1,
+      "Venta",
+      "",
+      "PC04",
+      1,
+      390,
+      0,
+      "Efectivo",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-23 11:01"
+    ],
+    [
+      "2026-09-23",
+      "V013",
+      1,
+      "Venta",
+      "",
+      "PC05",
+      1,
+      650,
+      20,
+      "Tarjeta",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-23 12:01"
+    ],
+    [
+      "2026-09-23",
+      "V014",
+      1,
+      "Venta",
+      "",
+      "PC06",
+      1,
+      580,
+      0,
+      "Transferencia",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-23 13:01"
+    ],
+    [
+      "2026-09-23",
+      "V014",
+      2,
+      "Venta",
+      "",
+      "PC07",
+      1,
+      350,
+      0,
+      "Transferencia",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-23 13:02"
+    ],
+    [
+      "2026-09-23",
+      "V015",
+      1,
+      "Venta",
+      "",
+      "PC07",
+      2,
+      350,
+      0,
+      "Efectivo",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-23 14:01"
+    ],
+    [
+      "2026-09-24",
+      "V016",
+      1,
+      "Venta",
+      "",
+      "PC04",
+      1,
+      390,
+      0,
+      "Efectivo",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-24 10:01"
+    ],
+    [
+      "2026-09-24",
+      "V016",
+      2,
+      "Venta",
+      "",
+      "PC05",
+      1,
+      650,
+      0,
+      "Efectivo",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-24 10:02"
+    ],
+    [
+      "2026-09-24",
+      "V017",
+      1,
+      "Venta",
+      "",
+      "PC05",
+      1,
+      650,
+      0,
+      "Tarjeta",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-24 11:01"
+    ],
+    [
+      "2026-09-24",
+      "V018",
+      1,
+      "Venta",
+      "",
+      "PC06",
+      1,
+      580,
+      20,
+      "Transferencia",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-24 12:01"
+    ],
+    [
+      "2026-09-24",
+      "V019",
+      1,
+      "Venta",
+      "",
+      "PC07",
+      1,
+      350,
+      0,
+      "Efectivo",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-24 13:01"
+    ],
+    [
+      "2026-09-24",
+      "V019",
+      2,
+      "Venta",
+      "",
+      "PC08",
+      1,
+      320,
+      0,
+      "Efectivo",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-24 13:02"
+    ],
+    [
+      "2026-09-24",
+      "V020",
+      1,
+      "Venta",
+      "",
+      "PC08",
+      2,
+      320,
+      0,
+      "Tarjeta",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-24 14:01"
+    ],
+    [
+      "2026-09-25",
+      "V021",
+      1,
+      "Venta",
+      "",
+      "PC05",
+      1,
+      650,
+      0,
+      "Tarjeta",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-25 10:01"
+    ],
+    [
+      "2026-09-25",
+      "V021",
+      2,
+      "Venta",
+      "",
+      "PC06",
+      1,
+      580,
+      0,
+      "Tarjeta",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-25 10:02"
+    ],
+    [
+      "2026-09-25",
+      "V022",
+      1,
+      "Venta",
+      "",
+      "PC06",
+      1,
+      580,
+      0,
+      "Transferencia",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-25 11:01"
+    ],
+    [
+      "2026-09-25",
+      "V023",
+      1,
+      "Venta",
+      "",
+      "PC07",
+      1,
+      350,
+      20,
+      "Efectivo",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-25 12:01"
+    ],
+    [
+      "2026-09-25",
+      "V024",
+      1,
+      "Venta",
+      "",
+      "PC08",
+      1,
+      320,
+      0,
+      "Tarjeta",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-25 13:01"
+    ],
+    [
+      "2026-09-25",
+      "V024",
+      2,
+      "Venta",
+      "",
+      "PC09",
+      1,
+      240,
+      0,
+      "Tarjeta",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-25 13:02"
+    ],
+    [
+      "2026-09-25",
+      "V025",
+      1,
+      "Venta",
+      "",
+      "PC09",
+      2,
+      240,
+      0,
+      "Transferencia",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-25 14:01"
+    ],
+    [
+      "2026-09-26",
+      "V026",
+      1,
+      "Venta",
+      "",
+      "PC06",
+      1,
+      580,
+      0,
+      "Transferencia",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-26 10:01"
+    ],
+    [
+      "2026-09-26",
+      "V026",
+      2,
+      "Venta",
+      "",
+      "PC07",
+      1,
+      350,
+      0,
+      "Transferencia",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-26 10:02"
+    ],
+    [
+      "2026-09-26",
+      "V027",
+      1,
+      "Venta",
+      "",
+      "PC07",
+      1,
+      350,
+      0,
+      "Efectivo",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-26 11:01"
+    ],
+    [
+      "2026-09-26",
+      "V028",
+      1,
+      "Venta",
+      "",
+      "PC08",
+      1,
+      320,
+      20,
+      "Tarjeta",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-26 12:01"
+    ],
+    [
+      "2026-09-26",
+      "V029",
+      1,
+      "Venta",
+      "",
+      "PC09",
+      1,
+      240,
+      0,
+      "Transferencia",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-26 13:01"
+    ],
+    [
+      "2026-09-26",
+      "V029",
+      2,
+      "Venta",
+      "",
+      "PC10",
+      1,
+      720,
+      0,
+      "Transferencia",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-26 13:02"
+    ],
+    [
+      "2026-09-26",
+      "V030",
+      1,
+      "Venta",
+      "",
+      "PC10",
+      2,
+      720,
+      0,
+      "Efectivo",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-26 14:01"
+    ],
+    [
+      "2026-09-27",
+      "V031",
+      1,
+      "Venta",
+      "",
+      "PC07",
+      1,
+      350,
+      0,
+      "Efectivo",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-27 10:01"
+    ],
+    [
+      "2026-09-27",
+      "V031",
+      2,
+      "Venta",
+      "",
+      "PC08",
+      1,
+      320,
+      0,
+      "Efectivo",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-27 10:02"
+    ],
+    [
+      "2026-09-27",
+      "V032",
+      1,
+      "Venta",
+      "",
+      "PC08",
+      1,
+      320,
+      0,
+      "Tarjeta",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-27 11:01"
+    ],
+    [
+      "2026-09-27",
+      "V033",
+      1,
+      "Venta",
+      "",
+      "PC09",
+      1,
+      240,
+      20,
+      "Transferencia",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-27 12:01"
+    ],
+    [
+      "2026-09-27",
+      "V034",
+      1,
+      "Venta",
+      "",
+      "PC10",
+      1,
+      720,
+      0,
+      "Efectivo",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-27 13:01"
+    ],
+    [
+      "2026-09-27",
+      "V034",
+      2,
+      "Venta",
+      "",
+      "PC01",
+      1,
+      450,
+      0,
+      "Efectivo",
+      "Laura",
+      "Activo",
+      "",
+      "2026-09-27 13:02"
+    ],
+    [
+      "2026-09-27",
+      "V035",
+      1,
+      "Venta",
+      "",
+      "PC01",
+      2,
+      450,
+      0,
+      "Tarjeta",
+      "Ana",
+      "Activo",
+      "",
+      "2026-09-27 14:01"
+    ],
+    [
+      "2026-09-24",
+      "D001",
+      1,
+      "Devolucion",
+      "V001/1",
+      "PC01",
+      1,
+      450,
+      0,
+      "Efectivo",
+      "Ana",
+      "Activo",
+      "Devolución de un par",
+      "2026-09-24 16:10"
+    ],
+    [
+      "2026-09-26",
+      "D002",
+      1,
+      "Devolucion",
+      "V008/1",
+      "PC04",
+      1,
+      390,
+      20,
+      "Efectivo",
+      "Ana",
+      "Activo",
+      "Devuelve el importe pagado con descuento",
+      "2026-09-26 17:20"
+    ],
+    [
+      "2026-09-21",
+      "V001",
+      1,
+      "Venta",
+      "",
+      "PC01",
+      1,
+      450,
+      0,
+      "Efectivo",
+      "Ana",
+      "Anulado",
+      "Duplicado conservado como evidencia",
+      "2026-09-21 10:03"
+    ],
+    [
+      "2026-10-01",
+      "V036",
+      1,
+      "Venta",
+      "",
+      "PC01",
+      1,
+      450,
+      0,
+      "Tarjeta",
+      "Laura",
+      "Activo",
+      "Prueba de cambio de mes",
+      "2026-10-01 11:10"
+    ]
+  ],
+  "headers": [
+    "Fecha",
+    "Folio",
+    "Linea",
+    "Tipo",
+    "Referencia",
+    "SKU",
+    "Cantidad",
+    "Precio",
+    "Descuento",
+    "Pago",
+    "Capturista",
+    "Estado",
+    "Nota",
+    "Capturado"
+  ],
+  "september": {
+    "bruto": 25390,
+    "descuentos": 140,
+    "devoluciones": 820,
+    "neto": 24430,
+    "pares": 54,
+    "lineas": 49,
+    "folios": 35
+  },
+  "october": {
+    "bruto": 450,
+    "descuentos": 0,
+    "devoluciones": 0,
+    "neto": 450,
+    "pares": 1,
+    "lineas": 1,
+    "folios": 1
+  },
+  "daily": [
+    {
+      "date": "2026-09-21",
+      "bruto": 4110,
+      "descuentos": 20,
+      "devoluciones": 0,
+      "neto": 4090,
+      "pares": 8,
+      "lineas": 7,
+      "folios": 5
+    },
+    {
+      "date": "2026-09-22",
+      "bruto": 3860,
+      "descuentos": 20,
+      "devoluciones": 0,
+      "neto": 3840,
+      "pares": 8,
+      "lineas": 7,
+      "folios": 5
+    },
+    {
+      "date": "2026-09-23",
+      "bruto": 3340,
+      "descuentos": 20,
+      "devoluciones": 0,
+      "neto": 3320,
+      "pares": 8,
+      "lineas": 7,
+      "folios": 5
+    },
+    {
+      "date": "2026-09-24",
+      "bruto": 3580,
+      "descuentos": 20,
+      "devoluciones": 450,
+      "neto": 3110,
+      "pares": 7,
+      "lineas": 7,
+      "folios": 5
+    },
+    {
+      "date": "2026-09-25",
+      "bruto": 3200,
+      "descuentos": 20,
+      "devoluciones": 0,
+      "neto": 3180,
+      "pares": 8,
+      "lineas": 7,
+      "folios": 5
+    },
+    {
+      "date": "2026-09-26",
+      "bruto": 4000,
+      "descuentos": 20,
+      "devoluciones": 370,
+      "neto": 3610,
+      "pares": 7,
+      "lineas": 7,
+      "folios": 5
+    },
+    {
+      "date": "2026-09-27",
+      "bruto": 3300,
+      "descuentos": 20,
+      "devoluciones": 0,
+      "neto": 3280,
+      "pares": 8,
+      "lineas": 7,
+      "folios": 5
+    }
+  ]
+};
+
+/* ============ CONFIGURACIÓN (edita estos 3 valores) ============ */
+const CONFIG={
+  SUPABASE_URL:'https://znbdnheeimjiemtjftkl.supabase.co',      // Supabase > Project Settings > API > Project URL
+  SUPABASE_ANON_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuYmRuaGVlaW1qaWVtdGpmdGtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNTUxNzYsImV4cCI6MjA5NDczMTE3Nn0.9lL24jrj-gQ2BJTfXOXLctdUOKe8RYEjA2EcDKj3UI0',              // Supabase > Project Settings > API > anon public
+  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbxbKUsa7387gu_t_OvMi3vo_fj7vx9-b_iRjDNFSdJxGLg6v_yzIqWCIDirrYpobuSAUA/exec', // URL de la app web de Apps Script
+  ALLOW_SIGNUP:false                                   // true = muestra "Crear cuenta" en la pantalla de acceso
+};
+/* ================================================================ */
+const SB_OK=!/TU-PROYECTO|TU_ANON/.test(CONFIG.SUPABASE_URL+CONFIG.SUPABASE_ANON_KEY);
+const GAS_OK=/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(CONFIG.APPS_SCRIPT_URL)&&!/TU_ID/.test(CONFIG.APPS_SCRIPT_URL);
+const sb=SB_OK?supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+const KEY='devq-paso-claro-demo-v1';let storeKey=KEY,qKey=null,user=null;const $=id=>document.getElementById(id),form=$('sale');
+let rows=[],persistent=true;
+function loadRows(){rows=DATA.rows.map(r=>[...r]);try{const saved=JSON.parse(localStorage.getItem(storeKey));if(Array.isArray(saved)&&saved.every(r=>Array.isArray(r)&&r.length===14))rows=saved;}catch{persistent=false;}}
+const fmt=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n);const round=n=>Math.round((n+Number.EPSILON)*100)/100;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function msg(t,bad=false){$('message').textContent=t;$('message').className=bad?'error':'';}
+function save(){try{localStorage.setItem(storeKey,JSON.stringify(rows));persistent=true;}catch{persistent=false;}$('storage').textContent=persistent?'Guardado en este navegador. Exporta el CSV al terminar.':'El navegador no permite guardar aquí. Exporta el CSV antes de cerrar; los cambios se perderán.';}
+function total(a){return a.reduce((o,r)=>{if(r[11]!=='Activo')return o;const gross=r[6]*r[7],v=round(gross-r[8]);if(r[3]==='Venta'){o.gross+=gross;o.discounts+=r[8];o.net+=v;o.pairs+=r[6];}else{o.returns+=v;o.net-=v;o.pairs-=r[6];}return o;},{gross:0,discounts:0,returns:0,net:0,pairs:0});}
+function render(){const month=$('month').value,subset=rows.filter(r=>r[0].startsWith(month)),t=total(subset);for(const [id,k]of [['gross','gross'],['discounts','discounts'],['returns','returns'],['net','net']])$(id).textContent=fmt(t[k]);const days=[...new Set(subset.map(r=>r[0]))].sort();$('daily').innerHTML=days.map(d=>{const a=total(subset.filter(r=>r[0]===d));return `<tr><td>${esc(d)}</td><td class="num">${fmt(a.net)}</td><td class="num">${a.pairs}</td></tr>`}).join('')||'<tr><td colspan="3">Sin registros para este mes</td></tr>';
+$('records').innerHTML=rows.map((r,i)=>({r,i})).filter(({r})=>r[0].startsWith(month)).reverse().map(({r,i})=>`<tr class="${r[11]==='Anulado'?'void':''}"><td>${esc(r[0])}</td><td>${esc(r[1])} / ${r[2]}</td><td>${r[3]==='Venta'?'Venta':'Devolución'}</td><td>${esc(r[5])}</td><td class="num">${r[6]}</td><td class="num">${fmt((r[6]*r[7]-r[8])*(r[3]==='Venta'?1:-1))}</td><td>${esc(r[11])}</td><td>${r[11]==='Activo'?`<button class="small annul" data-void="${i}">Anular</button>`:'—'}</td></tr>`).join('');save();}
+$('sku').innerHTML=DATA.catalog.map(c=>`<option value="${c[0]}">${c[0]} · ${esc(c[1])}</option>`).join('');
+function amount(){const f=new FormData(form);$('amount').textContent='Importe de la línea: '+fmt(Number(f.get('qty'))*Number(f.get('price'))-Number(f.get('discount')));}
+form.addEventListener('input',amount);$('sku').addEventListener('change',()=>{form.elements.price.value=DATA.catalog.find(c=>c[0]===$('sku').value)[3];amount();});
+form.addEventListener('submit',e=>{e.preventDefault();const f=new FormData(form);const date=f.get('date'),folio=f.get('folio').trim().toUpperCase(),line=Number(f.get('line')),type=f.get('type'),ref=f.get('ref').trim().toUpperCase(),sku=f.get('sku'),qty=Number(f.get('qty')),price=Number(f.get('price')),disc=Number(f.get('discount')),pay=f.get('pay'),person=f.get('person'),note=f.get('note').trim();const val=round(qty*price-disc);
+if(!date||!folio||!Number.isInteger(line)||line<1||!Number.isInteger(qty)||qty<1||price<0||disc<0||disc>qty*price)return msg('Revisa cantidad, precio y descuento.',true);
+if(rows.some(r=>r[1]===folio&&r[2]===line&&r[11]==='Activo'))return msg('Ya existe ese folio y línea activos. Usa otra línea o anula el error.',true);
+const sameTicket=rows.find(r=>r[1]===folio&&r[11]==='Activo');if(sameTicket&&(sameTicket[0]!==date||sameTicket[3]!==type||sameTicket[9]!==pay))return msg('Las líneas del mismo folio deben conservar fecha, tipo y forma de pago.',true);
+if(type==='Devolucion'){const original=rows.find(r=>`${r[1]}/${r[2]}`===ref&&r[3]==='Venta'&&r[11]==='Activo');if(!original||original[5]!==sku)return msg('Indica una venta activa y el mismo producto en la referencia original.',true);if(date<original[0])return msg('La devolución no puede ser anterior a la venta.',true);const prior=rows.filter(r=>r[3]==='Devolucion'&&r[4]===ref&&r[11]==='Activo');const q=prior.reduce((a,r)=>a+r[6],0),v=prior.reduce((a,r)=>a+r[6]*r[7]-r[8],0);if(q+qty>original[6]||round(v+val)>round(original[6]*original[7]-original[8]))return msg('La devolución excede los pares o el importe pendiente de devolver.',true);if(!note)return msg('Escribe el motivo de la devolución.',true);}
+if(val===0&&!note)return msg('Un importe cero requiere una observación.',true);
+const now=new Date();const captured=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '+now.toTimeString().slice(0,5);
+const row=[date,folio,line,type,type==='Venta'?'':ref,sku,qty,price,disc,pay,person,'Activo',note,captured];rows.push(row);$('month').value=date.slice(0,7);render();
+enqueue({action:'registro',id:uid(),record:{fecha:date,folio,linea:line,tipo:type,referencia:row[4],sku,producto:(DATA.catalog.find(c=>c[0]===sku)||[])[1]||'',cantidad:qty,precio:price,descuento:disc,importe:val,pago:pay,capturista:person,estado:'Activo',nota:note,capturado:captured}});msg('Guardado '+folio+'/'+line+'. Para otro producto del mismo ticket usa la siguiente línea.');form.elements.line.value=line+1;amount();});
+$('records').addEventListener('click',e=>{const b=e.target.closest('[data-void]');if(!b)return;const r=rows[Number(b.dataset.void)];if(rows.some(x=>x[3]==='Devolucion'&&x[4]===`${r[1]}/${r[2]}`&&x[11]==='Activo'))return msg('Esta venta tiene devoluciones activas. Revisa y anula esas devoluciones primero.',true);const reason=prompt('Motivo de la anulación:');if(!reason||!reason.trim())return;r[11]='Anulado';r[12]=(r[12]?r[12]+' | ':'')+'Anulado: '+reason.trim();render();
+enqueue({action:'anulacion',id:uid(),folio:r[1],linea:r[2],tipo:r[3],sku:r[5],motivo:reason.trim()});msg('Movimiento anulado. La fila se conserva.');});
+$('month').addEventListener('change',render);$('reset').addEventListener('click',()=>{if(!confirm('Se reemplazarán los cambios locales por los datos ficticios originales. ¿Continuar?'))return;rows=DATA.rows.map(r=>[...r]);$('month').value='2026-09';render();msg('Ejemplo restablecido.');});
+$('export').addEventListener('click',()=>{const safe=v=>typeof v==='string'&&/^[=+\-@]/.test(v)?"'"+v:v;const csv='\uFEFF'+[DATA.headers,...rows].map(r=>r.map(v=>'"'+String(safe(v)).replace(/"/g,'""')+'"').join(',')).join('\r\n');const u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=u;a.download='Paso_Claro_registros.csv';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);});
+
+/* ============ Cola de envío a Google Apps Script ============ */
+const uid=()=>(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));
+const qGet=()=>{try{return JSON.parse(localStorage.getItem(qKey))||[]}catch{return[]}};
+const qSet=a=>{try{localStorage.setItem(qKey,JSON.stringify(a))}catch{}};
+function setSync(t,bad=false,pending=false){$('sync').textContent=t;$('sync').className='storage'+(bad?' error':'');$('retry').hidden=!pending;}
+function enqueue(p){if(!GAS_OK||!user)return;const q=qGet();q.push(p);qSet(q);flushQueue();}
+let flushing=false;
+async function flushQueue(){
+  if(!GAS_OK){setSync('Apps Script no configurado: los movimientos solo se guardan en este navegador.',true);return;}
+  if(flushing||!sb||!user)return;
+  const q=qGet();if(!q.length){setSync('Todo sincronizado con Google Apps Script.');return;}
+  flushing=true;setSync('Enviando '+q.length+' movimiento(s)…');
+  try{
+    while(q.length){
+      const {data:{session}}=await sb.auth.getSession();
+      if(!session)throw new Error('sesión expirada, vuelve a entrar');
+      const res=await fetch(CONFIG.APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({...q[0],token:session.access_token,email:session.user.email})});
+      const j=await res.json();
+      if(!j.ok&&j.retry!==false)throw new Error(j.error||'error del servidor');
+      if(!j.ok)console.warn('Movimiento descartado por el servidor:',j.error);
+      q.shift();qSet(q);
+    }
+    setSync('Enviado. Se envió confirmación a '+user.email+'.');
+  }catch(err){setSync(q.length+' pendiente(s) de enviar ('+err.message+').',true,true);}
+  finally{flushing=false;}
+}
+$('retry').addEventListener('click',flushQueue);
+
+/* ============ Autenticación con Supabase ============ */
+let mode='login';
+const MODES={
+  login:{title:'Inicia sesión para registrar movimientos.',btn:'Entrar',pass:true,email:true,ac:'current-password'},
+  signup:{title:'Crea tu cuenta. Recibirás un correo para confirmarla.',btn:'Crear cuenta',pass:true,email:true,ac:'new-password'},
+  reset:{title:'Te enviaremos un enlace para restablecer tu contraseña.',btn:'Enviar enlace',pass:false,email:true},
+  recovery:{title:'Escribe tu nueva contraseña.',btn:'Guardar contraseña',pass:true,email:false,ac:'new-password'}
+};
+function authMsg(t,bad=false){$('authMsg').textContent=t;$('authMsg').className='authmsg'+(bad?' error':'');}
+function setMode(m){
+  mode=m;const c=MODES[m];$('authTitle').textContent=c.title;$('authSubmit').textContent=c.btn;
+  $('emailWrap').hidden=!c.email;$('passWrap').hidden=!c.pass;if(c.ac)$('authPass').autocomplete=c.ac;
+  const a=$('lnkA'),b=$('lnkB');a.hidden=b.hidden=false;
+  if(m==='login'){a.textContent='Crear cuenta';a.dataset.go='signup';a.hidden=!CONFIG.ALLOW_SIGNUP;b.textContent='Olvidé mi contraseña';b.dataset.go='reset';}
+  else if(m==='recovery'){a.hidden=b.hidden=true;}
+  else{a.textContent='← Volver a iniciar sesión';a.dataset.go='login';b.hidden=true;}
+  authMsg('');
+}
+$('lnkA').addEventListener('click',e=>setMode(e.target.dataset.go));
+$('lnkB').addEventListener('click',e=>setMode(e.target.dataset.go));
+const showAuth=()=>{$('auth').hidden=false;$('app').hidden=true;};
+const friendly=m=>/invalid login/i.test(m)?'Correo o contraseña incorrectos.':/not confirmed/i.test(m)?'Debes confirmar tu correo antes de entrar.':/already registered/i.test(m)?'Ese correo ya está registrado.':/rate limit/i.test(m)?'Demasiados intentos. Espera un momento.':m;
+$('authForm').addEventListener('submit',async e=>{
+  e.preventDefault();if(!sb)return authMsg('Supabase no está configurado.',true);
+  const email=$('authEmail').value.trim(),pass=$('authPass').value,c=MODES[mode];
+  if(c.email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return authMsg('Escribe un correo válido.',true);
+  if(c.pass&&pass.length<6)return authMsg('La contraseña debe tener al menos 6 caracteres.',true);
+  $('authSubmit').disabled=true;authMsg('Procesando…');
+  try{
+    let r;
+    if(mode==='login')r=await sb.auth.signInWithPassword({email,password:pass});
+    else if(mode==='signup'){r=await sb.auth.signUp({email,password:pass,options:{emailRedirectTo:location.href.split('#')[0]}});if(!r.error&&!r.data.session){setMode('login');authMsg('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.');return;}}
+    else if(mode==='reset'){r=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});if(!r.error){authMsg('Si el correo existe, recibirás un enlace para restablecer tu contraseña.');return;}}
+    else{r=await sb.auth.updateUser({password:pass});if(!r.error){authMsg('Contraseña actualizada.');$('authPass').value='';$('app').hidden=false;$('auth').hidden=true;const s=(await sb.auth.getSession()).data.session;if(s)enter(s);return;}}
+    if(r.error)authMsg(friendly(r.error.message),true);
+  }catch(err){authMsg('No se pudo conectar: '+err.message,true);}
+  finally{$('authSubmit').disabled=false;}
+});
+$('logout').addEventListener('click',async()=>{
+  if(!sb)return;
+  let failed=false;
+  try{const {error}=await sb.auth.signOut({scope:'local'});if(error)failed=true;}catch{failed=true;}
+  if(failed){ /* el servidor respondió 401/403 (sesión ya inexistente): se limpia la sesión local a mano */
+    try{Object.keys(localStorage).filter(k=>/^sb-.*-auth-token/.test(k)).forEach(k=>localStorage.removeItem(k));}catch{}
+    location.reload();return;
+  }
+  leave();
+});
+
+function enter(session){
+  const first=!user||user.id!==session.user.id;user=session.user;
+  $('userEmail').textContent=user.email;$('auth').hidden=true;$('app').hidden=false;
+  if(!first)return;
+  storeKey=KEY+':'+user.id;qKey='devq-sync-queue:'+user.id;
+  loadRows();render();amount();setTimeout(flushQueue,0);
+}
+function leave(){user=null;rows=[];$('authPass').value='';setMode('login');showAuth();}
+
+if(!sb){setMode('login');$('cfgWarn').hidden=false;$('authSubmit').disabled=true;showAuth();}
+else{
+  setMode('login');
+  sb.auth.onAuthStateChange((ev,session)=>{
+    if(ev==='PASSWORD_RECOVERY'){setMode('recovery');showAuth();return;}
+    if(session)setTimeout(()=>{if(mode!=='recovery')enter(session);},0);else leave();
+  });
+  sb.auth.getSession().then(({data:{session}})=>{if(!session)showAuth();});
+}
+
+</script></body></html>
