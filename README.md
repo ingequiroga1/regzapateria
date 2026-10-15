@@ -1,6 +1,5 @@
 # Shoe Sales Sync
 
-
 genera una aplicacion de  punto de venta para una zapateria solo agrega autenticacion con supabase y el formulario para registrar las ventas los registros de las ventas se enviaran a un google script para guardarlos en un google sheet la pantalla de ventas permitira cargar los registros desde el archivo google sheet
 
 This project was built with [Lovable](https://lovable.dev).

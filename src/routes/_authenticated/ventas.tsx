@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { guardarHoja, listarCatalogo, listarVentas, obtenerHoja, registrarVenta, type Venta } from "@/lib/ventas.functions";
+import { guardarHoja, listarCatalogo, listarVentas, obtenerHoja, registrarVenta, type ItemCatalogo, type Venta } from "@/lib/ventas.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/ventas")({
   component: Ventas,
 });
 
-const inicial = { cliente: "", modelo: "", talla: "", color: "", cantidad: 1, precio: 0, metodoPago: "Efectivo" };
+const inicial = { cliente: "", modelo: "", talla: "", color: "", cantidad: 1, precio: 0, costo: 0, descuento: 0, metodoPago: "Efectivo" };
 const dinero = (n: number) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(Number(n) || 0);
 
 function Ventas() {
@@ -41,7 +41,7 @@ function Ventas() {
   const [guardando, setGuardando] = useState(false);
   const [ventas, setVentas] = useState<Venta[] | null>(null);
   const [cargando, setCargando] = useState(false);
-  const [catalogo, setCatalogo] = useState<string[]>([]);
+  const [catalogo, setCatalogo] = useState<ItemCatalogo[]>([]);
   const obtenerHojaFn = useServerFn(obtenerHoja);
   const guardarHojaFn = useServerFn(guardarHoja);
   const [hojaId, setHojaId] = useState<string | null | undefined>(undefined);
@@ -83,7 +83,8 @@ function Ventas() {
     e.preventDefault();
     setGuardando(true);
     try {
-      const v = await registrar({ data: { ...form, cantidad: Number(form.cantidad), precio: Number(form.precio) } });
+      console.log("Guardando venta:", form);
+      const v = await registrar({ data: { ...form, cantidad: Number(form.cantidad), precio: Number(form.precio),costo: Number(form.costo), descuento: Number(form.descuento) || 0 } });
       toast.success(`Venta registrada: ${dinero(v.total)}`);
       setForm(inicial);
       if (ventas) setVentas([v, ...ventas]);
@@ -144,10 +145,10 @@ function Ventas() {
           <form onSubmit={guardar} className="mt-4 space-y-3">
             <Campo label="Cliente"><Input value={form.cliente} onChange={(e) => set("cliente", e.target.value)} placeholder="Opcional" /></Campo>
             <Campo label="Modelo">
-              <Select value={form.modelo} onValueChange={(v) => set("modelo", v)} required>
+              <Select value={form.modelo} onValueChange={(v) => { const item = catalogo.find((c) => c.modelo === v); setForm((f) => ({ ...f, modelo: v, precio: item?.precio ?? f.precio, costo: item?.costo ?? f.costo })); }} required>
                 <SelectTrigger><SelectValue placeholder={catalogo.length ? "Elige un modelo" : "Catálogo vacío o no cargado"} /></SelectTrigger>
                 <SelectContent>
-                  {catalogo.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                  {catalogo.map((c) => <SelectItem key={c.modelo} value={c.modelo}>{c.modelo} · {dinero(c.precio)}</SelectItem>)}
                 </SelectContent>
               </Select>
             </Campo>
@@ -156,6 +157,7 @@ function Ventas() {
               <Campo label="Color"><Input value={form.color} onChange={(e) => set("color", e.target.value)} /></Campo>
               <Campo label="Cantidad"><Input type="number" min={1} required value={form.cantidad} onChange={(e) => set("cantidad", e.target.value)} /></Campo>
               <Campo label="Precio unitario"><Input type="number" min={0} step="0.01" required value={form.precio} onChange={(e) => set("precio", e.target.value)} /></Campo>
+              <Campo label="Descuento ($)"><Input type="number" min={0} step="0.01" value={form.descuento} onChange={(e) => set("descuento", e.target.value)} /></Campo>
             </div>
             <Campo label="Método de pago">
               <Select value={form.metodoPago} onValueChange={(v) => set("metodoPago", v)}>
@@ -167,7 +169,7 @@ function Ventas() {
             </Campo>
             <div className="flex items-center justify-between rounded-md bg-accent px-3 py-2">
               <span className="text-sm">Total</span>
-              <span className="text-lg font-bold">{dinero(Number(form.cantidad) * Number(form.precio))}</span>
+              <span className="text-lg font-bold">{dinero(Math.max(0, Number(form.cantidad) * Number(form.precio) - (Number(form.descuento) || 0)))}</span>
             </div>
             <Button type="submit" className="w-full" disabled={guardando}>{guardando ? "Guardando..." : "Registrar venta"}</Button>
           </form>

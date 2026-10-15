@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { extraerIdHoja } from "./hoja-id";
 
+export type ItemCatalogo = { modelo: string; costo: number; precio: number };
+
 export type Venta = {
   fecha: string;
   cliente: string;
@@ -10,6 +12,8 @@ export type Venta = {
   color: string;
   cantidad: number;
   precio: number;
+  costo: number;
+  descuento: number;
   total: number;
   metodoPago: string;
   vendedor: string;
@@ -38,7 +42,7 @@ async function getJson(url: string) {
   const res = await fetch(url, { redirect: "follow" });
   const text = await res.text();
   if (!res.ok) throw new Error(`Google Script respondió ${res.status}: ${text.slice(0, 200)}`);
-  let json: { ventas?: Venta[]; catalogo?: string[]; error?: string };
+  let json: { ventas?: Venta[]; catalogo?: (ItemCatalogo | string)[]; error?: string };
   try {
     json = JSON.parse(text);
   } catch {
@@ -87,7 +91,9 @@ export const listarCatalogo = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const id = await hojaDe(context);
     const json = await getJson(`${scriptUrl()}?hoja=catalogo&sheetId=${encodeURIComponent(id)}`);
-    return (json.catalogo ?? []) as string[];
+    return (json.catalogo ?? []).map((c) =>
+      typeof c === "string" ? { modelo: c, costo: 0, precio: 0 } : { modelo: String(c.modelo), costo: Number(c.costo), precio: Number(c.precio) || 0 },
+    ) as ItemCatalogo[];
   });
 
 export const registrarVenta = createServerFn({ method: "POST" })
@@ -97,14 +103,17 @@ export const registrarVenta = createServerFn({ method: "POST" })
     if (!v.talla?.toString().trim()) throw new Error("La talla es obligatoria");
     if (!(v.cantidad > 0)) throw new Error("Cantidad inválida");
     if (!(v.precio >= 0)) throw new Error("Precio inválido");
+    if (!(v.descuento >= 0)) throw new Error("Descuento inválido");
+    if (v.descuento > v.cantidad * v.precio) throw new Error("El descuento no puede ser mayor que el subtotal");
     return v;
   })
   .handler(async ({ data, context }) => {
+    // console.log("registrarVenta", data, context.userId, context.claims);
     const id = await hojaDe(context);
     const venta: Venta = {
       ...data,
       fecha: new Date().toISOString(),
-      total: Math.round(data.cantidad * data.precio * 100) / 100,
+      total: Math.round((data.cantidad * data.precio - data.descuento) * 100) / 100,
       vendedor: (context.claims as { email?: string }).email ?? context.userId,
     };
     const res = await fetch(`${scriptUrl()}?sheetId=${encodeURIComponent(id)}`, {
